@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Register — Crypto Portfolio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" style="max-width:920px">
+    <div class="hero">
+      <div class="brand">
+        <div class="logo">CP</div>
+        <div>
+          <h1 class="h1">Create your account</h1>
+          <p class="lead">Get started in seconds. Secure authentication and easy onboarding.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <div class="card">
+          <h2 style="margin:0 0 8px 0">Register</h2>
+          <p class="small">Enter details to create an account.</p>
+
+          <div style="margin-top:18px">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input id="username" class="input" placeholder="nickname" />
+            </div>
+
+            <div class="form-group">
+              <label for="fullname">Full name</label>
+              <input id="fullname" class="input" placeholder="First Last" />
+            </div>
+
+            <div class="form-group">
+              <label for="emailr">Email</label>
+              <input id="emailr" class="input" type="email" placeholder="you@example.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="pwd">Password</label>
+              <input id="pwd" class="input" type="password" placeholder="Create a secure password" />
+              <div class="small">Use 8+ characters with numbers and letters.</div>
+            </div>
+
+            <div style="margin-top:18px; display:flex; gap:10px">
+              <button id="registerBtn" class="btn">Create account</button>
+              <a class="btn ghost" href="login.html" style="text-decoration:none">Back to login</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3 style="margin-top:0">Privacy & security</h3>
+        <p class="small">We store minimal info — email and profile. Passwords are hashed on the server.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    function showToast(msg, timeout=3000){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(()=> t.style.display = 'none', timeout);
+    }
+
+    async function apiPost(path, body){
+      const resp = await fetch(path, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+      if(!resp.ok) throw data;
+      return data;
+    }
+
+    document.getElementById('registerBtn').addEventListener('click', async ()=>{
+      const username = document.getElementById('username').value.trim();
+      const fullname = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('emailr').value.trim();
+      const password = document.getElementById('pwd').value;
+      if(!username || !email || !password){ showToast('Please complete all fields'); return; }
+      try{
+        const res = await apiPost('/api/auth/register', { username, fullname, email, password });
+        showToast('Account created — please login');
+        setTimeout(()=> location.href = 'login.html', 900);
+      }catch(err){
+        showToast(err?.message || 'Registration failed');
+      }
+    });
+  </script>
+</body>
+</html>

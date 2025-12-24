@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Login — Crypto Portfolio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="brand">
+        <div class="logo">CP</div>
+        <div>
+          <h1 class="h1">Crypto Portfolio Tracker</h1>
+          <p class="lead">Secure, beautiful, and simple. Sign in to view your holdings and analytics.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <div class="card">
+          <h2 style="margin:0 0 10px 0">Welcome back</h2>
+          <p class="small">Sign in to continue to your dashboard.</p>
+
+          <div style="margin-top:18px">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" class="input" type="email" inputmode="email" placeholder="you@example.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input id="password" class="input" type="password" placeholder="••••••••" />
+            </div>
+
+            <div class="link-row">
+              <a class="link" href="register.html">Create account</a>
+              <a class="link" href="#">Forgot password?</a>
+            </div>
+
+            <div style="margin-top:18px; display:flex; gap:10px">
+              <button id="loginBtn" class="btn">Login</button>
+              <button id="demo" class="btn ghost">Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="card">
+        <h3 style="margin-top:0">Why you'll love it</h3>
+        <ul style="margin:12px 0 0 18px; color:var(--muted)">
+          <li>Fast portfolio syncing</li>
+          <li>Clear performance charts</li>
+          <li>Transaction-level audit</li>
+        </ul>
+        <p class="small" style="margin-top:16px">Tip: Use the demo button to try without an account.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    function showToast(msg, timeout=3000){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(()=> t.style.display = 'none', timeout);
+    }
+
+    async function apiPost(path, body){
+      try{
+        const resp = await fetch(path, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await resp.json();
+        if(!resp.ok) throw data;
+        return data;
+      }catch(err){
+        throw err;
+      }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', async ()=>{
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if(!email || !password){ showToast('Enter email and password'); return; }
+      try{
+        const res = await apiPost('/api/auth/login', { email, password });
+        // expected { token: "...", user: { ... } }
+        localStorage.setItem('auth_token', res.token);
+        showToast('Login successful — redirecting...');
+        setTimeout(()=> location.href = 'dashboard.html', 900);
+      }catch(err){
+        showToast(err?.message || 'Login failed');
+      }
+    });
+
+    document.getElementById('demo').addEventListener('click', ()=>{
+      // prefill demo credentials or simulate login
+      document.getElementById('email').value = 'demo@example.com';
+      document.getElementById('password').value = 'demopass';
+      showToast('Demo credentials filled — click Login');
+    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard — Crypto Portfolio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div style="width:100%;max-width:1100px;margin:28px auto;padding:0 18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="logo">CP</div>
+        <div>
+          <div style="font-weight:700;font-size:18px">Your Dashboard</div>
+          <div class="small">High-level summary & next steps</div>
+        </div>
+      </div>
+      <div>
+        <button id="signout" class="btn ghost">Sign out</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Welcome</h2>
+      <p class="small" id="welcomeText">Loading user details…</p>
+
+      <div style="display:flex;flex-wrap:wrap; gap:18px;margin-top:20px">
+        <div style="flex:1;min-width:240px">
+          <div class="card" style="padding:18px;">
+            <h4 style="margin:0 0 8px 0">Portfolio Value</h4>
+            <div style="font-size:20px;font-weight:700">—</div>
+            <div class="small">Sync exchanges and wallet addresses to see value.</div>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:240px">
+          <div class="card" style="padding:18px;">
+            <h4 style="margin:0 0 8px 0">Next steps</h4>
+            <ol style="margin:0 0 6px 18px;color:var(--muted)">
+              <li>Connect exchange / wallet</li>
+              <li>Import transactions</li>
+              <li>Explore analytics & tax report</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      function showToast(msg, timeout=3000){
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(()=> t.style.display = 'none', timeout);
+      }
+
+      async function getUser(){
+        const token = localStorage.getItem('auth_token');
+        if(!token){ showToast('Not authenticated'); setTimeout(()=> location.href='login.html',800); return; }
+        try{
+          const resp = await fetch('/api/auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if(!resp.ok) throw await resp.json();
+          const data = await resp.json();
+          document.getElementById('welcomeText').textContent = `Hello, ${data.user?.fullname || data.user?.username || 'friend'} — here's your starting overview.`;
+        }catch(err){
+          localStorage.removeItem('auth_token');
+          showToast('Session expired — redirecting to login');
+          setTimeout(()=> location.href='login.html', 900);
+        }
+      }
+
+      document.getElementById('signout').addEventListener('click', ()=>{
+        localStorage.removeItem('auth_token'); location.href='login.html';
+      });
+
+      getUser();
+    </script>
+  </div>
+</body>
+</html>

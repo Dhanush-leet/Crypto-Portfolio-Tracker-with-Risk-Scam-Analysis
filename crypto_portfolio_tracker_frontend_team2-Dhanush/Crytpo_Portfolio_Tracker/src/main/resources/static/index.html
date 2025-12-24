@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Portfolio Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .hidden {
+            display: none;
+        }
+        .token-display {
+            background-color: #e9ecef;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crypto Portfolio Tracker - Backend Integration Test</h1>
+        
+        <!-- Authentication Section -->
+        <div id="auth-section">
+            <h2>Authentication</h2>
+            
+            <!-- Register Form -->
+            <div class="form-group">
+                <h3>Register</h3>
+                <label for="reg-username">Username:</label>
+                <input type="text" id="reg-username" placeholder="Enter username">
+                
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" placeholder="Enter email">
+                
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" placeholder="Enter password">
+                
+                <label for="reg-fullname">Full Name:</label>
+                <input type="text" id="reg-fullname" placeholder="Enter full name">
+                
+                <button onclick="register()">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="form-group">
+                <h3>Login</h3>
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" placeholder="Enter email">
+                
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" placeholder="Enter password">
+                
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+        
+        <!-- Token Display -->
+        <div id="token-section" class="hidden">
+            <h3>Current Token</h3>
+            <div id="token-display" class="token-display"></div>
+            <button onclick="logout()">Logout</button>
+        </div>
+        
+        <!-- Exchange Section -->
+        <div id="exchange-section" class="hidden">
+            <h2>Exchange Connections</h2>
+            
+            <!-- Connect Exchange Form -->
+            <div class="form-group">
+                <h3>Connect Exchange</h3>
+                <label for="exchange-name">Exchange Name:</label>
+                <select id="exchange-name">
+                    <option value="binance">Binance</option>
+                    <option value="coinbase">Coinbase</option>
+                    <option value="kraken">Kraken</option>
+                </select>
+                
+                <label for="api-key">API Key:</label>
+                <input type="text" id="api-key" placeholder="Enter API key">
+                
+                <label for="api-secret">API Secret:</label>
+                <input type="text" id="api-secret" placeholder="Enter API secret">
+                
+                <label for="passphrase">Passphrase (optional):</label>
+                <input type="text" id="passphrase" placeholder="Enter passphrase">
+                
+                <button onclick="connectExchange()">Connect Exchange</button>
+            </div>
+            
+            <!-- Get Connections Button -->
+            <button onclick="getExchanges()">Get My Exchanges</button>
+        </div>
+        
+        <!-- Results -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('authToken');
+        
+        // Update UI based on authentication status
+        function updateUI() {
+            const authSection = document.getElementById('auth-section');
+            const tokenSection = document.getElementById('token-section');
+            const exchangeSection = document.getElementById('exchange-section');
+            const tokenDisplay = document.getElementById('token-display');
+            
+            if (authToken) {
+                authSection.classList.add('hidden');
+                tokenSection.classList.remove('hidden');
+                exchangeSection.classList.remove('hidden');
+                tokenDisplay.textContent = authToken;
+            } else {
+                authSection.classList.remove('hidden');
+                tokenSection.classList.add('hidden');
+                exchangeSection.classList.add('hidden');
+            }
+        }
+        
+        // Show result
+        function showResult(message, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="result ${isError ? 'error' : 'success'}">${message}</div>`;
+        }
+        
+        // Register function
+        async function register() {
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const fullName = document.getElementById('reg-fullname').value;
+            
+            if (!username || !email || !password || !fullName) {
+                showResult('Please fill in all fields', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        fullName: fullName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    updateUI();
+                    showResult('Registration successful! Token received.');
+                } else {
+                    showResult('Registration failed: ' + data.message, true);
+                }
+            } catch (error) {
+                showResult('Registration error: ' + error.message, true);
+            }
+        }
+        
+        // Login function
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showResult('Please enter email and password', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    updateUI();
+                    showResult('Login successful! Token received.');
+                } else {
+                    showResult('Login failed: ' + data.message, true);
+                }
+            } catch (error) {
+                showResult('Login error: ' + error.message, true);
+            }
+        }
+        
+        // Connect Exchange function
+        async function connectExchange() {
+            const exchangeName = document.getElementById('exchange-name').value;
+            const apiKey = document.getElementById('api-key').value;
+            const apiSecret = document.getElementById('api-secret').value;
+            const passphrase = document.getElementById('passphrase').value;
+            
+            if (!apiKey || !apiSecret) {
+                showResult('Please enter API key and secret', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/exchanges/connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        exchangeName: exchangeName,
+                        apiKey: apiKey,
+                        apiSecret: apiSecret,
+                        passphrase: passphrase,
+                        isTestnet: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('Exchange connected successfully!');
+                } else {
+                    showResult('Connection failed: ' + JSON.stringify(data), true);
+                }
+            } catch (error) {
+                showResult('Connection error: ' + error.message, true);
+            }
+        }
+        
+        // Get Exchanges function
+        async function getExchanges() {
+            try {
+                const response = await fetch('http://localhost:8080/api/exchanges', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('Your exchanges: ' + JSON.stringify(data, null, 2));
+                } else {
+                    showResult('Failed to get exchanges: ' + JSON.stringify(data), true);
+                }
+            } catch (error) {
+                showResult('Error fetching exchanges: ' + error.message, true);
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateUI();
+            showResult('Logged out successfully');
+        }
+        
+        // Health check function
+        async function healthCheck() {
+            try {
+                const response = await fetch('http://localhost:8080/auth/health');
+                const data = await response.json();
+                showResult('Backend health: ' + JSON.stringify(data));
+            } catch (error) {
+                showResult('Backend health check failed: ' + error.message, true);
+            }
+        }
+        
+        // Initialize UI
+        updateUI();
+        
+        // Check backend health on page load
+        healthCheck();
+    </script>
+</body>
+</html>

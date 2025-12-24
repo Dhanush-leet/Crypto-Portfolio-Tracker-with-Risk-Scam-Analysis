@@ -1,0 +1,274 @@
+.analytics-dashboard {
+  margin-bottom: 2rem;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  background: var(--background-card);
+  backdrop-filter: var(--blur-md);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  transition: all var(--transition-normal);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.card-value.large {
+  font-size: 2rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.card-footer .positive {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.card-footer .negative {
+  color: #F44336;
+  font-weight: 500;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.allocation-section,
+.top-coins-section {
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  background: var(--background-card);
+  backdrop-filter: var(--blur-md);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timeframe-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timeframe-selector button {
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-light);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.timeframe-selector button.active,
+.timeframe-selector button:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.allocation-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.allocation-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.allocation-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.coin-symbol {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.allocation-percentage {
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.allocation-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.allocation-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.allocation-value {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  text-align: right;
+}
+
+.coins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.coin-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  transition: all var(--transition-fast);
+}
+
+.coin-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.coin-rank {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  min-width: 30px;
+}
+
+.coin-info {
+  flex: 1;
+}
+
+.coin-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.coin-amount {
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.coin-value {
+  text-align: right;
+}
+
+.value-amount {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.value-change.positive {
+  color: #4CAF50;
+  font-size: 0.875rem;
+}
+
+.value-change.negative {
+  color: #F44336;
+  font-size: 0.875rem;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+}
+
+.no-data p {
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .timeframe-selector {
+    align-self: stretch;
+    justify-content: center;
+  }
+  
+  .card-value.large {
+    font-size: 1.5rem;
+  }
+}
